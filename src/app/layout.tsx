@@ -15,8 +15,9 @@ const META_THEME_COLORS = {
 };
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: 'Devops-Pipeline',
+  description:
+    'An end-to-end DevOps CI/CD pipeline showcasing automation, containerization, and cloud-native deployment practices.'
 };
 
 export const viewport: Viewport = {

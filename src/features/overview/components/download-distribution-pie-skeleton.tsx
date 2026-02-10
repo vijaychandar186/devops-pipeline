@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-export function PieGraphSkeleton() {
+export function DownloadDistributionPieSkeleton() {
   return (
     <Card>
       <CardHeader className='flex flex-col items-stretch space-y-0 border-b p-0'>
@@ -11,9 +11,8 @@ export function PieGraphSkeleton() {
         </div>
       </CardHeader>
       <CardContent className='p-6'>
-        <div className='flex h-[280px] items-center justify-center'>
-          {/* Circular skeleton for pie chart */}
-          <Skeleton className='h-[300px] w-[300px] rounded-full' />
+        <div className='flex h-[200px] items-center justify-center'>
+          <Skeleton className='h-[200px] w-[200px] rounded-full' />
         </div>
       </CardContent>
     </Card>

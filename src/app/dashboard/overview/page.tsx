@@ -1,8 +1,7 @@
 import OverViewPage from '@/features/overview/components/overview';
+import { fetchLLMData } from '@/features/overview/actions/fetch-llm-data';
 
 export default async function Overview() {
-  // Simulate async data fetching - replace with real API calls in production
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  return <OverViewPage />;
+  const data = await fetchLLMData();
+  return <OverViewPage data={data} />;
 }
