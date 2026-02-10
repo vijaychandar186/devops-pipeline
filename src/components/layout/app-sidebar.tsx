@@ -21,7 +21,7 @@ import {
 import { navItems } from '@/config/nav-config';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useFilteredNavItems } from '@/hooks/use-nav';
-import { IconChevronRight } from '@tabler/icons-react';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -60,7 +60,7 @@ export default function AppSidebar() {
                       >
                         {item.icon && <Icon />}
                         <span>{item.title}</span>
-                        <IconChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                        <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>

@@ -11,7 +11,7 @@ import { TopModelsBar } from './top-models-bar';
 import { ModelComparisonArea } from './model-comparison-area';
 import { DownloadDistributionPie } from './download-distribution-pie';
 import { TrendingModels } from './trending-models';
-import { IconTrendingUp, IconDownload } from '@tabler/icons-react';
+import { TrendingUp, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { formatCompact } from '@/lib/utils';
 import type { LLMDashboardData } from '@/features/overview/actions/fetch-llm-data';
@@ -30,14 +30,14 @@ export default function OverViewPage({ data }: { data: LLMDashboardData }) {
                 </CardTitle>
                 <CardAction>
                   <Badge variant='outline'>
-                    <IconTrendingUp />
+                    <TrendingUp />
                     {formatCompact(model.likes)} likes
                   </Badge>
                 </CardAction>
               </CardHeader>
               <CardFooter className='flex-col items-start gap-1.5 text-sm'>
                 <div className='line-clamp-1 flex gap-2 font-medium'>
-                  {model.name} <IconDownload className='size-4' />
+                  {model.name} <Download className='size-4' />
                 </div>
                 <div className='text-muted-foreground line-clamp-1'>
                   {model.id}

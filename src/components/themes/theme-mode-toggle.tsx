@@ -1,6 +1,6 @@
 'use client';
 
-import { IconBrightness } from '@tabler/icons-react';
+import { Contrast } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import * as React from 'react';
 
@@ -39,7 +39,7 @@ export function ThemeModeToggle() {
       className='group/toggle size-8'
       onClick={handleThemeToggle}
     >
-      <IconBrightness />
+      <Contrast />
       <span className='sr-only'>Toggle theme</span>
     </Button>
   );
