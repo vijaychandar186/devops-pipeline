@@ -6,7 +6,7 @@ FROM base AS deps
 WORKDIR /app
 
 # Install dependencies
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 # Rebuild the source code only when needed
@@ -31,7 +31,7 @@ ENV NODE_ENV production
 # Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN adduser --system --uid 1001 nextjs
+RUN echo "nextjs:x:1001:1001::/home/nextjs:/bin/sh" >> /etc/passwd
 
 COPY --from=builder /app/public ./public
 
