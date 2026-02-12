@@ -5,15 +5,18 @@ FROM base AS deps
 
 WORKDIR /app
 
-# Install dependencies
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# Install dependencies (skip postinstall since Prisma files aren't available yet)
+COPY package.json bun.lock* ./
+RUN bun install --ignore-scripts
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Generate Prisma Client
+RUN bunx prisma generate
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -35,6 +38,14 @@ RUN echo "nextjs:x:1001:1001::/home/nextjs:/bin/sh" >> /etc/passwd
 
 COPY --from=builder /app/public ./public
 
+# Copy Prisma files for runtime
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+
+# Copy entrypoint script
+COPY docker-entrypoint.prod.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.prod.sh
+
 # Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown nextjs:bun .next
@@ -53,4 +64,5 @@ ENV PORT 3000
 # Set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["bun", "server.js"]
+# Run migrations and start production server
+CMD ["/usr/local/bin/docker-entrypoint.prod.sh"]

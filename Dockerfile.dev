@@ -1,0 +1,28 @@
+FROM oven/bun:latest
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json bun.lock* ./
+
+# Copy Prisma schema and config before install (needed for postinstall)
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+
+# Install dependencies (skip postinstall, will generate Prisma after)
+RUN bun install --ignore-scripts
+
+# Generate Prisma Client
+RUN bunx prisma generate
+
+# Copy application code (in dev, this will be overridden by volume mount)
+COPY . .
+
+# Copy entrypoint script
+COPY docker-entrypoint.dev.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.dev.sh
+
+EXPOSE 3000
+
+# Run migrations and start development server
+CMD ["/usr/local/bin/docker-entrypoint.dev.sh"]

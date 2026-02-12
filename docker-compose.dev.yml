@@ -2,19 +2,28 @@ services:
   nextjs-app:
     build:
       context: .
-      dockerfile: Dockerfile.prod
-      target: runner
-    container_name: nextjs-bun-app
+      dockerfile: Dockerfile.dev
+    container_name: nextjs-bun-app-dev
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       PORT: 3000
       HOSTNAME: 0.0.0.0
       DATABASE_URL: postgresql://admin:mysecretpassword@postgres:5432/mydatabase
-    expose:
-      - '3000'
+    ports:
+      - '3000:3000'
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./prisma:/app/prisma
+      - ./prisma.config.ts:/app/prisma.config.ts
+      # Exclude node_modules and .next from being overwritten
+      - /app/node_modules
+      - /app/.next
+      - /app/src/generated
     depends_on:
       - postgres
     networks:
@@ -22,7 +31,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: postgres-db
+    container_name: postgres-db-dev
     restart: unless-stopped
     environment:
       POSTGRES_USER: admin
@@ -31,31 +40,18 @@ services:
     ports:
       - '5433:5432'
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - devops-pipeline
-
-  nginx:
-    image: nginx:latest
-    container_name: reverse-proxy
-    restart: always
-    depends_on:
-      - nextjs-app
-    ports:
-      - '8000:8000'
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - postgres-data-dev:/var/lib/postgresql/data
     networks:
       - devops-pipeline
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin
+    container_name: pgadmin-dev
     restart: unless-stopped
     env_file:
       - .env
     volumes:
-      - pga-data:/var/lib/pgadmin
+      - pga-data-dev:/var/lib/pgadmin
     ports:
       - '5050:80'
     depends_on:
@@ -64,8 +60,8 @@ services:
       - devops-pipeline
 
 volumes:
-  postgres-data:
-  pga-data:
+  postgres-data-dev:
+  pga-data-dev:
 
 networks:
   devops-pipeline:

@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.prod
       target: runner
-    container_name: nextjs-bun-app
+    container_name: nextjs-bun-app-prod
     restart: unless-stopped
     env_file:
       - .env
