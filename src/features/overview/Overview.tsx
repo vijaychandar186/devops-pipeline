@@ -7,10 +7,10 @@ import {
   CardTitle,
   CardAction
 } from '@/components/ui/card';
-import { TopModelsBar } from './top-models-bar';
-import { ModelComparisonArea } from './model-comparison-area';
-import { DownloadDistributionPie } from './download-distribution-pie';
-import { TrendingModels } from './trending-models';
+import { TopModelsBar } from '../../components/dashboard/overview/top-models-bar';
+import { ModelComparisonArea } from '../../components/dashboard/overview/model-comparison-area';
+import { DownloadDistributionPie } from '../../components/dashboard/overview/download-distribution-pie';
+import { TrendingModels } from '../../components/dashboard/overview/trending-models';
 import { TrendingUp, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { formatCompact } from '@/lib/utils';

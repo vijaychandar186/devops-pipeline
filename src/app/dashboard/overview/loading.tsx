@@ -1,8 +1,8 @@
 import PageContainer from '@/components/layout/page-container';
-import { ModelComparisonAreaSkeleton } from '@/features/overview/components/model-comparison-area-skeleton';
-import { TopModelsBarSkeleton } from '@/features/overview/components/top-models-bar-skeleton';
-import { DownloadDistributionPieSkeleton } from '@/features/overview/components/download-distribution-pie-skeleton';
-import { TrendingModelsSkeleton } from '@/features/overview/components/trending-models-skeleton';
+import { ModelComparisonAreaSkeleton } from '@/components/dashboard/overview/model-comparison-area-skeleton';
+import { TopModelsBarSkeleton } from '@/components/dashboard/overview/top-models-bar-skeleton';
+import { DownloadDistributionPieSkeleton } from '@/components/dashboard/overview/download-distribution-pie-skeleton';
+import { TrendingModelsSkeleton } from '@/components/dashboard/overview/trending-models-skeleton';
 import { Card, CardFooter, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 

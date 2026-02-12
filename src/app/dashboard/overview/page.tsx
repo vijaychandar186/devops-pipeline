@@ -1,4 +1,4 @@
-import OverViewPage from '@/features/overview/components/overview';
+import OverViewPage from '@/features/overview/Overview';
 import { fetchLLMData } from '@/features/overview/actions/fetch-llm-data';
 
 export default async function Overview() {
