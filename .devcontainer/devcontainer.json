@@ -7,7 +7,9 @@
 	"features": {
 		"ghcr.io/devcontainers-extra/features/bun:1": {},
 		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-		"ghcr.io/devcontainers-extra/features/prettier:1": {}
+		"ghcr.io/devcontainers-extra/features/prettier:1": {},
+		"ghcr.io/devcontainers-extra/features/pre-commit:2": {},
+		"ghcr.io/devcontainers-extra/features/prisma:2": {},
 	},
 
 	"containerEnv": {
@@ -21,7 +23,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bun install",
+  	"postCreateCommand": "apt-get update && apt-get install -y postgresql-client && bun install",
 	
 
 	// Configure tool-specific properties.
