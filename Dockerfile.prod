@@ -38,9 +38,16 @@ RUN echo "nextjs:x:1001:1001::/home/nextjs:/bin/sh" >> /etc/passwd
 
 COPY --from=builder /app/public ./public
 
+# Copy package files for module resolution
+COPY --from=builder /app/package.json ./package.json
+
 # Copy Prisma files for runtime
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+
+# Copy dependencies needed for migrations and runtime
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src/generated ./src/generated
 
 # Copy entrypoint script
 COPY docker-entrypoint.prod.sh /usr/local/bin/
