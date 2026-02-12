@@ -177,6 +177,32 @@ bunx prisma generate
 
 ---
 
+## Prisma Studio
+
+Prisma Studio is a visual database browser that allows you to view and edit data in your database through a GUI.
+
+To open Prisma Studio:
+
+```bash
+npx prisma studio
+```
+
+This will:
+
+- Start a local web server (default: `http://localhost:5555`)
+- Open your database in a visual editor
+- Allow you to browse, create, update, and delete records
+- Provide an intuitive interface for managing your database data
+
+Prisma Studio is useful for:
+
+- Inspecting your database during development
+- Manually testing database changes
+- Quickly viewing and editing data without writing SQL queries
+- Debugging data-related issues
+
+---
+
 # Development Workflow
 
 Whenever you modify your Prisma schema:
@@ -189,6 +215,34 @@ This will:
 
 1. Generate a new migration file and apply it to your database
 2. Regenerate the Prisma Client with updated types and model methods
+
+---
+
+## Reset Database
+
+To reset your database and reapply all migrations from scratch:
+
+```bash
+npx prisma migrate reset
+```
+
+**Warning:** This command is destructive and will:
+
+1. Drop the database (or delete all data in SQLite)
+2. Create a new database with the same name
+3. Apply all migrations from the `prisma/migrations` folder
+4. Run seed scripts (if configured in `package.json`)
+
+**Use cases:**
+
+- Starting fresh during development
+- Resolving migration conflicts
+- Testing migrations from a clean state
+- Resetting development database to initial state
+
+**Important:** Never run this command in production! It will delete all your data.
+
+For production environments, use `prisma migrate deploy` instead, which only applies pending migrations without resetting the database.
 
 ---
 

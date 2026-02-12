@@ -6,11 +6,13 @@ services:
       target: runner
     container_name: nextjs-bun-app
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       NODE_ENV: production
       PORT: 3000
       HOSTNAME: 0.0.0.0
-      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/appdb
+      DATABASE_URL: postgresql://admin:mysecretpassword@postgres:5432/mydatabase
     expose:
       - '3000'
     depends_on:
@@ -23,9 +25,11 @@ services:
     container_name: postgres-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
-      POSTGRES_DB: appdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - '5433:5432'
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
