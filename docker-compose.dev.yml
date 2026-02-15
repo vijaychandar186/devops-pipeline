@@ -6,7 +6,7 @@ services:
     container_name: nextjs-bun-app-dev
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
     environment:
       NODE_ENV: development
       PORT: 3000
@@ -49,7 +49,10 @@ services:
     container_name: pgadmin-dev
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     volumes:
       - pga-data-dev:/var/lib/pgadmin
     ports:

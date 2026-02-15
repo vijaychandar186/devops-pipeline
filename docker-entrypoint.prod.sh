@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
 
-echo "Applying database migrations..."
-bunx prisma migrate deploy
+echo "Pushing database schema..."
+bunx prisma db push
 
-echo "Migrations applied!"
+echo "Schema push complete!"
 echo "Starting production server..."
 exec bun server.js
