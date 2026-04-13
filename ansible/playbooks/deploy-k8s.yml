@@ -1,7 +1,0 @@
----
-# Apply K8s manifests to EKS (run from bastion or CI)
-- name: Deploy to Kubernetes
-  hosts: bastion
-  become: no
-  roles:
-    - kubectl

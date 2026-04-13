@@ -9,13 +9,6 @@ export default function GlobalError({
   error: Error & { digest?: string };
 }) {
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') {
-      void import('@sentry/nextjs').then((Sentry) => {
-        Sentry.captureException(error);
-      });
-      return;
-    }
-
     console.error(error);
   }, [error]);
 

@@ -283,37 +283,37 @@ If you want to use a Google Font in your theme:
 
 1. **Import the font** from `next/font/google`:
 
-   ```typescript
-   import { Your_Font_Name } from 'next/font/google';
-   ```
+```typescript
+import { Your_Font_Name } from 'next/font/google';
+```
 
 2. **Configure the font** with a CSS variable:
 
-   ```typescript
-   const fontYourName = Your_Font_Name({
-     subsets: ['latin'],
-     weight: ['400', '500', '700'], // Adjust weights as needed
-     variable: '--font-your-name' // Optional: custom variable name
-   });
-   ```
+```typescript
+const fontYourName = Your_Font_Name({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'], // Adjust weights as needed
+  variable: '--font-your-name' // Optional: custom variable name
+});
+```
 
 3. **Add it to the `fontVariables` export**:
 
-   ```typescript
-   export const fontVariables = cn(
-     // ... existing fonts
-     fontYourName.variable
-   );
-   ```
+```typescript
+export const fontVariables = cn(
+  // ... existing fonts
+  fontYourName.variable
+);
+```
 
 4. **Use the font in your theme CSS** by its display name (not the CSS variable):
 
-   ```css
-   [data-theme='your-theme-name'] {
-     --font-sans: 'Your Font Name', sans-serif; /* Use the actual font name */
-     --font-mono: 'Your Mono Font', monospace;
-   }
-   ```
+```css
+[data-theme='your-theme-name'] {
+  --font-sans: 'Your Font Name', sans-serif; /* Use the actual font name */
+  --font-mono: 'Your Mono Font', monospace;
+}
+```
 
 **Important Notes:**
 
@@ -411,7 +411,7 @@ For a minimal theme, you can copy an existing theme and modify only the colors y
 
 ### OKLCH Format
 
-```text
+```
 oklch(lightness chroma hue)
 ```
 
@@ -522,37 +522,37 @@ You only need to add fonts to `font.config.ts` if:
 
 1. **Import the font** in `src/components/themes/font.config.ts`:
 
-   ```typescript
-   import { Roboto, Roboto_Mono } from 'next/font/google';
-   ```
+```typescript
+import { Roboto, Roboto_Mono } from 'next/font/google';
+```
 
 2. **Configure the font** with a CSS variable:
 
-   ```typescript
-   const fontRoboto = Roboto({
-     subsets: ['latin'],
-     weight: ['400', '500', '700'],
-     variable: '--font-roboto'
-   });
-   ```
+```typescript
+const fontRoboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-roboto'
+});
+```
 
 3. **Add to fontVariables export**:
 
-   ```typescript
-   export const fontVariables = cn(
-     // ... existing fonts
-     fontRoboto.variable
-   );
-   ```
+```typescript
+export const fontVariables = cn(
+  // ... existing fonts
+  fontRoboto.variable
+);
+```
 
 4. **Use in your theme CSS** with the font's display name:
 
-   ```css
-   [data-theme='your-theme'] {
-     --font-sans: 'Roboto', sans-serif; /* Use display name, not CSS variable */
-     --font-mono: 'Roboto Mono', monospace;
-   }
-   ```
+```css
+[data-theme='your-theme'] {
+  --font-sans: 'Roboto', sans-serif; /* Use display name, not CSS variable */
+  --font-mono: 'Roboto Mono', monospace;
+}
+```
 
 ### Important Notes
 

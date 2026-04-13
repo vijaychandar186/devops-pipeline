@@ -1,7 +1,0 @@
----
-# Deploy the full stack via Docker Compose
-- name: Deploy devops-pipeline
-  hosts: app_servers
-  become: yes
-  roles:
-    - app

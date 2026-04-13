@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import NextTopLoader from 'nextjs-toploader';
-import './globals.css';
+import '../styles/globals.css';
 
 const META_THEME_COLORS = {
   light: '#ffffff',

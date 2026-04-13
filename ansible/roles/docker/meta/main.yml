@@ -1,9 +1,0 @@
-galaxy_info:
-  role_name: docker
-  author: devops-pipeline
-  description: Install and configure Docker on Ubuntu hosts
-  min_ansible_version: "2.9"
-  platforms:
-    - name: Ubuntu
-      versions:
-        - jammy

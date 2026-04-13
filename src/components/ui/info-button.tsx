@@ -6,10 +6,8 @@ import { Button } from '@/components/ui/button';
 import { useInfobar, type InfobarContent } from '@/components/ui/infobar';
 import { cn } from '@/lib/utils';
 
-interface InfoButtonProps extends Omit<
-  React.ComponentProps<typeof Button>,
-  'content'
-> {
+interface InfoButtonProps
+  extends Omit<React.ComponentProps<typeof Button>, 'content'> {
   content: InfobarContent;
   variant?:
     | 'default'

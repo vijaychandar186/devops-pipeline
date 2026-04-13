@@ -1,8 +1,0 @@
----
-# Provision and harden a fresh Ubuntu server
-- name: Provision app servers
-  hosts: app_servers
-  become: yes
-  roles:
-    - common
-    - docker

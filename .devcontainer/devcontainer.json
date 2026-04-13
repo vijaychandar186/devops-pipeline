@@ -1,140 +1,38 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-  "name": "DevOps Pipeline",
+	"name": "Node.js & TypeScript",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+	"features": {
+		"ghcr.io/devcontainers-extra/features/bun:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+		"ghcr.io/devcontainers-extra/features/prettier:1": {}
+	},
 
-  // Debian Bookworm + Node 22 LTS — Bun is added as a feature below.
-  // Node is kept so Next.js tooling (eslint-config-next, prisma, etc.) works without shims.
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+	"containerEnv": {
+		"DOCKER_API_VERSION": "1.43"
+	},
 
-  // ── Features ──────────────────────────────────────────────────────────────
-  "features": {
-    // Runtime / package managers
-    "ghcr.io/devcontainers-extra/features/bun:1": {},
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
 
-    // Container tooling — uses the host Docker socket (no nested daemon)
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-      "dockerDashComposeVersion": "v2"
-    },
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
 
-    // Infrastructure tooling
-    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
-      "version": "latest",
-      "helm": "latest",
-      "minikube": "none"
-    },
-    "ghcr.io/devcontainers/features/terraform:1": {
-      "version": "latest",
-      "tflint": "latest"
-    },
-    "ghcr.io/devcontainers/features/aws-cli:1": {},
-    "ghcr.io/devcontainers-extra/features/ansible:2": {},
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "bun install",
+	
 
-    // Developer tooling
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers-extra/features/prettier:1": {},
-    "ghcr.io/devcontainers-extra/features/prisma:2": {}
-  },
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"esbenp.prettier-vscode"
+			]
+		}
+	}
 
-  // ── Environment ────────────────────────────────────────────────────────────
-  "containerEnv": {
-    // Keeps docker CLI happy when the host daemon is older
-    "DOCKER_API_VERSION": "1.43"
-  },
-
-  // ── Post-create setup ──────────────────────────────────────────────────────
-  // See .devcontainer/setup.sh for the full install steps.
-  "postCreateCommand": "bash .devcontainer/setup.sh",
-
-  // ── Port forwarding ────────────────────────────────────────────────────────
-  // All ports are forwarded to localhost so services started inside the
-  // container are reachable from the host browser / CLI without extra steps.
-  "forwardPorts": [
-    80,    // nginx (reverse proxy)
-    3000,  // Next.js app (direct)
-    3001,  // Grafana
-    3100,  // Loki
-    3200,  // Tempo
-    4001,  // llm-aggregator
-    4002,  // user-analytics
-    5050,  // pgAdmin
-    5173,  // model-widget (Vite HMR)
-    5174,  // model-widget (Vite preview)
-    5433,  // PostgreSQL (host-mapped from 5432)
-    5555,  // Prisma Studio
-    6379,  // Redis
-    8082,  // Redis Commander
-    8888,  // OTel Collector self-telemetry
-    9090,  // Prometheus
-    9113,  // nginx-prometheus-exporter
-    9121,  // redis-exporter
-    9187   // postgres-exporter
-  ],
-
-  "portsAttributes": {
-    "80":   { "label": "nginx (reverse proxy)",        "onAutoForward": "silent" },
-    "3000": { "label": "Next.js app",                  "onAutoForward": "notify" },
-    "3001": { "label": "Grafana",                      "onAutoForward": "silent" },
-    "3100": { "label": "Loki",                         "onAutoForward": "silent" },
-    "3200": { "label": "Tempo",                        "onAutoForward": "silent" },
-    "4001": { "label": "llm-aggregator",               "onAutoForward": "silent" },
-    "4002": { "label": "user-analytics",               "onAutoForward": "silent" },
-    "5050": { "label": "pgAdmin",                      "onAutoForward": "silent" },
-    "5173": { "label": "model-widget (HMR)",           "onAutoForward": "silent" },
-    "5174": { "label": "model-widget",                 "onAutoForward": "silent" },
-    "5433": { "label": "PostgreSQL",                   "onAutoForward": "silent" },
-    "5555": { "label": "Prisma Studio",                "onAutoForward": "silent" },
-    "6379": { "label": "Redis",                        "onAutoForward": "silent" },
-    "8082": { "label": "Redis Commander",              "onAutoForward": "silent" },
-    "8888": { "label": "OTel Collector self-telemetry", "onAutoForward": "silent" },
-    "9090": { "label": "Prometheus",                   "onAutoForward": "silent" },
-    "9113": { "label": "nginx-prometheus-exporter",    "onAutoForward": "silent" },
-    "9121": { "label": "redis-exporter",               "onAutoForward": "silent" },
-    "9187": { "label": "postgres-exporter",            "onAutoForward": "silent" }
-  },
-
-  // ── VS Code customisations ─────────────────────────────────────────────────
-  "customizations": {
-    "vscode": {
-
-      "extensions": [
-        // JavaScript / TypeScript
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "ms-vscode.vscode-typescript-next",
-
-        // Tailwind CSS
-        "bradlc.vscode-tailwindcss",
-
-        // Database / ORM
-        "Prisma.prisma",
-        "cweijan.vscode-postgresql-client2",
-
-        // Docker
-        "ms-azuretools.vscode-docker",
-
-        // Kubernetes
-        "ms-kubernetes-tools.vscode-kubernetes-tools",
-
-        // Infrastructure
-        "HashiCorp.terraform",
-        "redhat.ansible",
-
-        // Makefile
-        "ms-vscode.makefile-tools",
-
-        // Markdown and docs
-        "DavidAnson.vscode-markdownlint",
-        "streetsidesoftware.code-spell-checker",
-
-        // Git / GitHub
-        "GitHub.vscode-github-actions",
-        "GitHub.vscode-pull-request-github",
-        "eamodio.gitlens",
-
-        // Developer experience
-        "usernamehw.errorlens",
-        "PKief.material-icon-theme",
-        "christian-kohler.path-intellisense"
-      ]
-    }
-  }
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
 }
