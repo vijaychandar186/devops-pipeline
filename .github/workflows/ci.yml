@@ -1,0 +1,250 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  # ── Lint & type-check ──────────────────────────────────────────────────────
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Format check
+        run: bun format:check
+
+      - name: TypeScript type-check
+        run: bunx tsc --noEmit
+
+  # ── Docs lint (Markdown + spell check) ───────────────────────────────────
+  docs-lint:
+    name: Markdown & Spell Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: |
+            **/*.md
+            !node_modules
+            !CHANGELOG.md
+
+      - name: codespell
+        uses: codespell-project/actions-codespell@v2
+        with:
+          ignore_words_list: aks,nd
+          skip: bun.lock,*.lock,node_modules,.next,dist,build,coverage,results,public,prisma/migrations
+
+  # ── Unit tests ─────────────────────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install root dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install service dependencies
+        run: |
+          bun install --frozen-lockfile --cwd services/llm-aggregator
+          bun install --frozen-lockfile --cwd services/user-analytics
+
+      - name: Run unit tests
+        run: bun test:unit
+
+  # ── Integration tests ──────────────────────────────────────────────────────
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:8-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install all dependencies
+        run: |
+          bun install --frozen-lockfile
+          bun install --frozen-lockfile --cwd services/llm-aggregator
+          bun install --frozen-lockfile --cwd services/user-analytics
+
+      - name: Start llm-aggregator
+        env:
+          REDIS_URL: redis://localhost:6379
+          PORT: 4001
+        run: bun services/llm-aggregator/src/index.ts &
+
+      - name: Start user-analytics
+        env:
+          DATABASE_URL: postgresql://admin:testpassword@localhost:5432/testdb
+          PORT: 4002
+        run: bun services/user-analytics/src/index.ts &
+
+      - name: Wait for services
+        run: |
+          for i in {1..20}; do
+            curl -sf http://localhost:4001/health && curl -sf http://localhost:4002/health && break
+            sleep 2
+          done
+
+      - name: Run integration tests
+        env:
+          LLM_AGGREGATOR_URL: http://localhost:4001
+          USER_ANALYTICS_URL: http://localhost:4002
+        run: bun test:integration
+
+  # ── Build images ───────────────────────────────────────────────────────────
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, docs-lint]
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      app_image:           ${{ steps.meta-app.outputs.tags }}
+      llm_aggregator_image: ${{ steps.meta-llm.outputs.tags }}
+      user_analytics_image: ${{ steps.meta-ua.outputs.tags }}
+      model_widget_image:   ${{ steps.meta-mw.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata — app
+        id: meta-app
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/devops-pipeline
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build & push — app
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.prod
+          push: true
+          tags: ${{ steps.meta-app.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Extract metadata — llm-aggregator
+        id: meta-llm
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/devops-pipeline-llm-aggregator
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build & push — llm-aggregator
+        uses: docker/build-push-action@v6
+        with:
+          context: services/llm-aggregator
+          push: true
+          tags: ${{ steps.meta-llm.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Extract metadata — user-analytics
+        id: meta-ua
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/devops-pipeline-user-analytics
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build & push — user-analytics
+        uses: docker/build-push-action@v6
+        with:
+          context: services/user-analytics
+          push: true
+          tags: ${{ steps.meta-ua.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Extract metadata — model-widget
+        id: meta-mw
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/devops-pipeline-model-widget
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build & push — model-widget
+        uses: docker/build-push-action@v6
+        with:
+          context: micro-frontends/model-widget
+          push: true
+          tags: ${{ steps.meta-mw.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

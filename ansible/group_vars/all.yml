@@ -1,0 +1,26 @@
+# ── Common variables ──────────────────────────────────────────────────────────
+project: devops-pipeline
+environment: production
+
+# Docker
+docker_version: "27.x"
+docker_compose_version: "v2.32.0"
+
+# Node.js (for non-containerised tooling)
+node_version: "22"
+
+# Bun
+bun_version: latest
+
+# AWS region (used by helpers that call the AWS CLI)
+aws_region: us-east-1
+
+# Container registry
+registry: ghcr.io/vijaychandar186
+
+# Images
+images:
+  app:             "{{ registry }}/devops-pipeline:latest"
+  llm_aggregator:  "{{ registry }}/devops-pipeline-llm-aggregator:latest"
+  user_analytics:  "{{ registry }}/devops-pipeline-user-analytics:latest"
+  model_widget:    "{{ registry }}/devops-pipeline-model-widget:latest"

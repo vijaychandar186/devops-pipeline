@@ -1,0 +1,9 @@
+galaxy_info:
+  role_name: common
+  author: devops-pipeline
+  description: Common baseline configuration for Ubuntu hosts
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy

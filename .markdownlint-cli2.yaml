@@ -1,0 +1,43 @@
+# markdownlint-cli2 configuration
+# https://github.com/DavidAnson/markdownlint-cli2
+
+# Globs to lint (relative to repo root)
+globs:
+  - "**/*.md"
+  - "!node_modules"
+  - "!.next"
+  - "!dist"
+  - "!CHANGELOG.md"   # auto-generated — skip
+
+config:
+  # MD013 — line length: disabled because tables and code blocks can be long
+  MD013: false
+
+  # MD033 — inline HTML: allow (used sparingly in README)
+  MD033: false
+
+  # MD041 — first line must be h1: relax for partial doc files
+  MD041: false
+
+  # MD024 — duplicate headings: allow in changelog / multi-section docs
+  MD024:
+    siblings_only: true
+
+  # MD029 — ordered list style: allow any consistent style
+  MD029:
+    style: ordered
+
+  # MD036 — emphasis used as heading: warn but don't fail
+  MD036: false
+
+  # MD046 — code block style: fenced only
+  MD046:
+    style: fenced
+
+  # MD049 — emphasis style: consistent underscores
+  MD049:
+    style: underscore
+
+  # MD050 — strong style: consistent asterisks
+  MD050:
+    style: asterisk

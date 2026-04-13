@@ -1,0 +1,28 @@
+# Jenkins plugins for local Jenkinsfile testing.
+# Installed at image build time via jenkins-plugin-cli.
+
+# Pipeline
+workflow-aggregator
+pipeline-stage-view
+
+# Job DSL — required for the jobs: key in casc.yaml
+job-dsl
+
+# Git
+git
+
+# Docker
+docker-workflow
+docker-plugin
+
+# Credentials
+credentials-binding
+plain-credentials
+
+# Utilities
+ansicolor
+timestamper
+ws-cleanup
+
+# Configuration as Code
+configuration-as-code

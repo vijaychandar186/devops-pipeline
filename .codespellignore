@@ -1,0 +1,12 @@
+# Files / paths fully ignored by codespell
+# (same syntax as .gitignore)
+bun.lock
+*.lock
+node_modules/
+.next/
+dist/
+build/
+coverage/
+results/
+public/
+prisma/migrations/

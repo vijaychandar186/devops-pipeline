@@ -1,0 +1,37 @@
+# LocalStack — emulates AWS APIs locally for Terraform testing.
+# Supports: VPC, EC2, RDS, ElastiCache, IAM, STS
+# Does NOT support: EKS (Pro only) — use kind for K8s testing instead.
+#
+# Usage:
+#   make localstack-up        # start LocalStack
+#   make tf-local-plan        # plan against LocalStack
+#   make tf-local-apply       # apply against LocalStack
+#   make localstack-down      # stop + wipe state
+#
+# Credentials are hard-coded to "test/test" — no real AWS account needed.
+
+services:
+  localstack:
+    image: localstack/localstack:3
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: vpc,ec2,rds,elasticache,iam,sts
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      PERSISTENCE: 1
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: >
+        curl -sf http://localhost:4566/_localstack/health
+        | python3 -c "import sys,json; s=json.load(sys.stdin)['services']; sys.exit(0 if s.get('ec2')=='running' else 1)"
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 10s
+
+volumes:
+  localstack-data:

@@ -1,0 +1,32 @@
+# ── deps: install & generate (heavily cached) ────────────────────────────────
+FROM oven/bun:latest AS deps
+WORKDIR /app
+
+COPY package.json bun.lock* ./
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+
+RUN bun install --frozen-lockfile --ignore-scripts
+RUN bunx prisma generate
+
+# ── runner: lean dev image ────────────────────────────────────────────────────
+FROM oven/bun:latest
+WORKDIR /app
+
+# Pull pre-built deps and generated Prisma client from cache
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/src/generated ./src/generated
+
+# Copy remaining config files (source is volume-mounted in dev)
+COPY package.json bun.lock* ./
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+COPY next.config.ts tsconfig.json postcss.config.mjs ./
+COPY public ./public
+COPY src ./src
+
+COPY docker-entrypoint.dev.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.dev.sh
+
+EXPOSE 3000
+CMD ["/usr/local/bin/docker-entrypoint.dev.sh"]

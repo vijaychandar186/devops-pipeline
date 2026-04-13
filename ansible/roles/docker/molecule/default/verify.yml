@@ -1,0 +1,51 @@
+---
+- name: Verify docker role
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Docker CE is installed
+      package:
+        name: docker-ce
+        state: present
+      check_mode: true
+      register: docker_pkg
+
+    - name: Assert docker-ce was installed
+      assert:
+        that: not docker_pkg.changed
+        fail_msg: "docker-ce was not installed by the docker role"
+
+    - name: Docker daemon config exists
+      stat:
+        path: /etc/docker/daemon.json
+      register: daemon_conf
+
+    - name: Assert daemon.json was created
+      assert:
+        that: daemon_conf.stat.exists
+        fail_msg: "/etc/docker/daemon.json was not created"
+
+    - name: daemon.json contains log rotation settings
+      command: grep -q "max-size" /etc/docker/daemon.json
+      changed_when: false
+
+    - name: Docker GPG key is in place
+      stat:
+        path: /etc/apt/keyrings/docker.asc
+      register: docker_gpg
+
+    - name: Assert Docker GPG key exists
+      assert:
+        that: docker_gpg.stat.exists
+        fail_msg: "/etc/apt/keyrings/docker.asc was not created"
+
+    - name: Docker APT repository is configured
+      stat:
+        path: /etc/apt/sources.list.d/docker.list
+      register: docker_repo
+
+    - name: Assert Docker repo is in place
+      assert:
+        that: docker_repo.stat.exists
+        fail_msg: "Docker APT repo was not configured"

@@ -1,0 +1,26 @@
+# Copy this file to terraform.tfvars and fill in the values.
+# Never commit terraform.tfvars to version control.
+
+project     = "devops-pipeline"
+environment = "production"
+region      = "us-east-1"
+
+# VPC
+vpc_cidr = "10.0.0.0/16"
+
+# EKS
+eks_cluster_version  = "1.31"
+node_instance_types  = ["t3.medium"]
+node_min_size        = 2
+node_max_size        = 6
+node_desired_size    = 3
+
+# RDS
+db_name            = "mydatabase"
+db_username        = "admin"
+db_password        = "change-me-strong-password"
+rds_instance_class = "db.t3.micro"
+
+# ElastiCache
+elasticache_node_type = "cache.t3.micro"
+redis_auth_token      = "change-me-16chars-min"

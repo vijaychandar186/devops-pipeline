@@ -1,0 +1,8 @@
+# Variables specific to application servers
+app_port: 3000
+llm_aggregator_port: 4001
+user_analytics_port: 4002
+
+# Directories
+app_dir: /opt/devops-pipeline
+compose_file: docker-compose.prod.yml

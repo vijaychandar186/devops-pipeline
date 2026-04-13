@@ -1,0 +1,43 @@
+---
+- name: Verify common role
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Base packages are installed
+      package:
+        name: "{{ item }}"
+        state: present
+      check_mode: true
+      register: pkg_check
+      loop:
+        - curl
+        - git
+        - jq
+        - ca-certificates
+
+    - name: Assert packages were installed (not changed in check mode)
+      assert:
+        that: not item.changed
+        fail_msg: "Package {{ item.item }} was not installed by the common role"
+      loop: "{{ pkg_check.results }}"
+
+    - name: Check if sshd_config exists
+      stat:
+        path: /etc/ssh/sshd_config
+      register: sshd_config_stat
+
+    - name: SSH sshd_config disables root login
+      command: grep -q "^PermitRootLogin no" /etc/ssh/sshd_config
+      changed_when: false
+      when: sshd_config_stat.stat.exists
+
+    - name: Auto-upgrades config exists
+      stat:
+        path: /etc/apt/apt.conf.d/20auto-upgrades
+      register: upgrades_conf
+
+    - name: Assert auto-upgrades config is in place
+      assert:
+        that: upgrades_conf.stat.exists
+        fail_msg: "/etc/apt/apt.conf.d/20auto-upgrades was not created"

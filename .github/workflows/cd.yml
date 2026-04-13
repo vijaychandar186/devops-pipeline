@@ -1,0 +1,74 @@
+name: CD — Deploy to Production
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region ${{ secrets.AWS_REGION || 'us-east-1' }} --name devops-pipeline-production
+
+      - name: Update image tags in k8s manifests
+        run: |
+          SHA=${{ github.event.workflow_run.head_sha }}
+          SHORT_SHA=${SHA::7}
+          sed -i "s|:latest|:sha-${SHORT_SHA}|g" k8s/app.yaml
+          sed -i "s|:latest|:sha-${SHORT_SHA}|g" k8s/services.yaml
+
+      - name: Apply K8s manifests
+        run: kubectl apply -k k8s/
+
+      - name: Wait for rollout — nextjs-app
+        run: kubectl rollout status deployment/nextjs-app -n devops-pipeline --timeout=300s
+
+      - name: Wait for rollout — llm-aggregator
+        run: kubectl rollout status deployment/llm-aggregator -n devops-pipeline --timeout=300s
+
+      - name: Wait for rollout — user-analytics
+        run: kubectl rollout status deployment/user-analytics -n devops-pipeline --timeout=300s
+
+      - name: Wait for rollout — model-widget
+        run: kubectl rollout status deployment/model-widget -n devops-pipeline --timeout=300s
+
+      - name: Run smoke tests against production
+        env:
+          APP_URL:            ${{ secrets.PROD_APP_URL }}
+          LLM_AGGREGATOR_URL: ${{ secrets.PROD_LLM_AGGREGATOR_URL }}
+          USER_ANALYTICS_URL: ${{ secrets.PROD_USER_ANALYTICS_URL }}
+          MODEL_WIDGET_URL:   ${{ secrets.PROD_MODEL_WIDGET_URL }}
+        run: |
+          bun install --frozen-lockfile
+          bun test:smoke
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Production deployment failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            })

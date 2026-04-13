@@ -1,0 +1,21 @@
+[codespell]
+# Files and directories to skip
+skip = .git,node_modules,bun.lock,*.lock,*.min.js,*.min.css,dist,build,.next,coverage,results
+
+# Ignore specific words that are false positives for this project
+# - aks: Azure Kubernetes Service acronym
+# - nd: used in prometheus metric names
+# - pris: Prisma's short URL prefix (pris.ly) in auto-generated schema comments
+ignore-words-list = aks,nd,pris
+
+# Ignore lines matching these patterns (regex)
+# ignore-regex =
+
+# Write corrections in-place (use --write-changes / make spell-fix)
+# write-changes = false
+
+# Check hidden files too
+check-hidden = true
+
+# Quiet mode: only show misspellings
+quiet-level = 3
